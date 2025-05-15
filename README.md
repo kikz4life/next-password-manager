@@ -1,5 +1,52 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+# 🏋️‍♀️ NextJS - Password Manager
+
+Your Password Manager Built for Security. End-to-end encrypted. Only **you** can see your passwords. Sign up securely with your favorite provider.
+
+---
+
+## 🚀 Tools & Technologies
+
+### 🧑‍💼 [Clerk](https://clerk.com/)
+The most comprehensive **User Management Platform**, providing seamless authentication and user session handling.
+
+### 🍃 [MongoDB](https://www.mongodb.com/)
+A highly scalable NoSQL document-based database used for secure and efficient password storage.
+
+### 🔗 [Convex](https://www.convex.dev/)
+A fully integrated backend platform for modern web apps, handling **database**, **functions**, and **real-time updates** without server management. (Optional / legacy)
+
+### 🎨 [shadcn/ui](https://ui.shadcn.com/)
+A beautifully designed **component library** based on Tailwind CSS and Radix UI. Perfect for rapidly building accessible UI with modern aesthetics.
+
+### 🌐 [ngrok](https://ngrok.com/)
+Used during development to expose local servers to the public internet and test webhooks in real-time.
+
+### 📬 [Svix](https://www.npmjs.com/package/svix)
+An SDK for **webhook verification and delivery**, used for integrating with event-based systems like Clerk.
+
+### 🔔 [react-hot-toast](https://react-hot-toast.com/)
+For sleek and customizable toast notifications in the UI.
+
+### 💨 [Tailwind CSS](https://tailwindcss.com/)
+A utility-first CSS framework for rapid UI development.
+
+---
+
+## 🔐 Features
+
+- 🔒 End-to-end password encryption
+- 🔑 Authentication via Clerk (email, Google, etc.)
+- 🧠 Password storage with MongoDB
+- 🧾 Copy-to-clipboard functionality
+- 👀 Toggle password visibility
+- 🧹 Filter/search passwords
+- ✏️ Edit or delete stored credentials
+- 📦 API routes with secure data access
+- 🎛️ Paginated table layout with Shadcn UI
+- 📡 Clerk webhook handling with Svix
+
 ## Getting Started
 
 First, run the development server:
