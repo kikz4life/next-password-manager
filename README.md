@@ -2,6 +2,8 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 # 🏋️‍♀️ NextJS - Password Manager
 
+**Live Site:** [https://next-password-manager.vercel.app/](https://next-password-manager.vercel.app/)
+
 Your Password Manager Built for Security. End-to-end encrypted. Only **you** can see your passwords. Sign up securely with your favorite provider.
 
 ---
