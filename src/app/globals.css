@@ -119,4 +119,65 @@
   body {
     @apply bg-background text-foreground;
   }
+  /* https://tailwindcss.com/docs/upgrade-guide#buttons-use-the-default-cursor */
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+@keyframes scanline {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 100%;
+  }
+}
+
+/* TODO: EXPLAIN THIS BC U PROMISED JUST IN THE FIRST SECTION */
+@keyframes slow-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-scanline {
+  animation: scanline 8s linear infinite;
+}
+
+.animate-slow-spin {
+  animation: slow-spin 12s linear infinite;
+}
+
+@keyframes sound-wave {
+  0% {
+    height: 10%;
+  }
+  50% {
+    height: 100%;
+  }
+  100% {
+    height: 10%;
+  }
+}
+
+.animate-sound-wave {
+  animation: sound-wave 1.2s ease-in-out infinite;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-in-out forwards;
 }

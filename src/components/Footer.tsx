@@ -16,7 +16,7 @@ const Footer = () => {
   <Terminal className="w-4 h-4 text-primary"/>
     </div>
     <span className="text-xl font-bold font-mono">
-    working<span className="text-primary">onmyend</span>.dev
+    working<span className="text-red-600">onmyend</span>.dev
     </span>
     </Link>
     <p className="text-sm text-muted-foreground">
