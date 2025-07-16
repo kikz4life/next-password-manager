@@ -19,6 +19,7 @@ type Props = {
 const VaultPage = () => {
   const [passwords, setPasswords] = useState<Props[]>([]);
   const [visiblePasswords, setVisiblePasswords] = useState<{ [key: string]: boolean }>({});
+  const [loading, setLoading] = useState(true);
 
   const {user, isLoaded} = useUser();
 
@@ -44,6 +45,8 @@ const VaultPage = () => {
     const fetchPasswords = async () => {
       if(!isLoaded || !user?.id) return;
 
+      setLoading(true);
+      
       const response = await fetch(`/api/vault`,{
         method: "GET",
       });
@@ -51,6 +54,8 @@ const VaultPage = () => {
       console.log(json.data);
 
       if(json.success) setPasswords(json.data);
+      
+      setLoading(false);
     }
 
     fetchPasswords();
@@ -77,8 +82,11 @@ const VaultPage = () => {
         </Button>
       </div>
 
-
-        <PasswordTable columns={columns(visiblePasswords, setVisiblePasswords, handleDelete)} data={passwords} />
+      <PasswordTable 
+        columns={columns(visiblePasswords, setVisiblePasswords, handleDelete)} 
+        data={passwords} 
+        loading={loading}
+      />
     </div>
   );
 };

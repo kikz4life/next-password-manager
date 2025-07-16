@@ -23,7 +23,8 @@ export async function GET(
       ...data,
       name: data.name,
       username: data.username,
-      password: decrypt(data.password)
+      password: decrypt(data.password),
+      notes: data.notes
     }
 
     return NextResponse.json({success: true, data: decrypted});

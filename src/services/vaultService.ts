@@ -9,9 +9,10 @@ interface SavePasswordProps {
     iv: string,
     content: string
   },
+  notes: string,
 }
 
-export const savePassword = async ({userId, name, username, password}: SavePasswordProps) => {
+export const savePassword = async ({userId, name, username, password, notes}: SavePasswordProps) => {
   await connectDB();
 
   const newPassword = await Password.create({
@@ -19,6 +20,7 @@ export const savePassword = async ({userId, name, username, password}: SavePassw
     name,
     username,
     password,
+    notes
   });
 
   return newPassword;

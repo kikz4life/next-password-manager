@@ -29,15 +29,18 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {clsx} from "clsx";
+import {Skeleton} from "@/components/ui/skeleton";
 
 interface PasswordTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  loading?: boolean
 }
 
 export function PasswordTable<TData, TValue>({
                                            columns,
                                            data,
+                                           loading = false,
                                          }: PasswordTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -47,9 +50,26 @@ export function PasswordTable<TData, TValue>({
     React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
 
+  // Create skeleton data and columns when loading
+  const tableData = React.useMemo(
+    () => (loading ? Array(5).fill({}) : data),
+    [loading, data]
+  );
+
+  const tableColumns = React.useMemo(
+    () =>
+      loading
+        ? columns.map((column) => ({
+          ...column,
+          cell: () => <Skeleton className="h-4 w-full bg-gray-300 animate-pulse" />,
+        }))
+        : columns,
+    [loading, columns]
+  );
+
   const table = useReactTable({
-    data,
-    columns,
+    data: tableData,
+    columns: tableColumns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setSorting,
@@ -76,10 +96,11 @@ export function PasswordTable<TData, TValue>({
             table.getColumn("name")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
+          disabled={loading}
         />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
+            <Button variant="outline" className="ml-auto" disabled={loading}>
               Toggle Columns
             </Button>
           </DropdownMenuTrigger>
@@ -150,7 +171,7 @@ export function PasswordTable<TData, TValue>({
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No results.
+                  {loading ? <Skeleton className="h-4 w-32 mx-auto bg-gray-300" /> : "No results."}
                 </TableCell>
               </TableRow>
             )}
@@ -162,7 +183,7 @@ export function PasswordTable<TData, TValue>({
           variant="outline"
           size="sm"
           onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
+          disabled={!table.getCanPreviousPage() || loading}
         >
           Previous
         </Button>
@@ -170,7 +191,7 @@ export function PasswordTable<TData, TValue>({
           variant="outline"
           size="sm"
           onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
+          disabled={!table.getCanNextPage() || loading}
         >
           Next
         </Button>

@@ -1,69 +1,143 @@
 "use client"
 
 import {Card, CardContent, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
-import {Lock, User, Eye, EyeOff} from "lucide-react";
+import {Lock, User, Eye, EyeOff, NotebookText, KeyRound, FolderPen} from "lucide-react";
 import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import {useParams, useRouter} from "next/navigation";
 import React, {useEffect, useState} from "react";
 import toast from "react-hot-toast";
+import {Skeleton} from "@/components/ui/skeleton";
 
 interface FormProps {
   name: string;
   username: string;
   password: string;
+  notes: string;
 }
 
 const EditPage = () => {
-
   const router = useRouter();
   const [form, setForm] = useState<FormProps>({
     name: "",
     username: "",
     password: "",
-  })
+    notes: ""
+  });
 
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isUpdating, setIsUpdating] = useState(false);
   const {id} = useParams();
 
   const handleUpdate = async () => {
-    const response = await fetch(`/api/vault/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(form),
-    });
+    setIsUpdating(true);
+    try {
+      const response = await fetch(`/api/vault/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(form),
+      });
 
-    if(response.ok){
-      toast.success(`${form.name} updated successfully!`);
-      router.push("/vault");
+      if(response.ok){
+        toast.success(`${form.name} updated successfully!`);
+        router.push("/vault");
+      }
+    } catch (error) {
+      console.error("Failed to update", error);
+    } finally {
+      setIsUpdating(false);
     }
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm({...form, [e.target.name]: e.target.value});
   }
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await fetch(`/api/vault/${id}`, {
-        method: "GET",
-      });
-      const json = await response.json();
-
-      if(json.success) {
-        setForm({
-          name: json.data.name,
-          username: json.data.username,
-          password: json.data.password
+      if (!id) return;
+      
+      setIsLoading(true);
+      try {
+        const response = await fetch(`/api/vault/${id}`, {
+          method: "GET",
         });
+        const json = await response.json();
+        console.log(json);
+
+        if(json.success) {
+          setForm({
+            name: json.data.name,
+            username: json.data.username,
+            password: json.data.password,
+            notes: json.data.notes || "", // Add fallback for existing records
+          });
+        }
+      } catch (error) {
+        console.error("Failed to fetch data", error);
+      } finally {
+        setIsLoading(false);
       }
     }
 
-    if(id) fetchData();
+    fetchData();
   }, [id]);
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-100 p-4">
+        <Card className="w-full max-w-md shadow-lg">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-xl">
+              <Lock className="h-5 w-5"/>
+              Update Password
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label htmlFor="name">Name</Label>
+              <div className="relative">
+                <FolderPen className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500"/>
+                <Skeleton className="h-10 w-full bg-gray-300" />
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="username">Username</Label>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500"/>
+                <Skeleton className="h-10 w-full bg-gray-300" />
+              </div>
+            </div>
+
+            <div className="space-y-2 relative">
+              <Label htmlFor="password">Password</Label>
+              <div className="relative">
+                <KeyRound className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500"/>
+                <Skeleton className="h-10 w-full bg-gray-300" />
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="notes">Notes</Label>
+              <div className="relative">
+                <NotebookText className="absolute left-3 top-1/10 h-4 w-4 text-gray-500"/>
+                <Skeleton className="h-24 w-full bg-gray-300" />
+              </div>
+            </div>
+          </CardContent>
+          <CardFooter className="flex justify-end space-x-2">
+            <Skeleton className="h-10 w-20 bg-gray-300" />
+            <Skeleton className="h-10 w-20 bg-gray-300" />
+          </CardFooter>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100 p-4">
@@ -78,7 +152,7 @@ const EditPage = () => {
           <div>
             <Label htmlFor="name">Name</Label>
             <div className="relative">
-              <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500"/>
+              <FolderPen className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500"/>
               <Input
                 id="name"
                 name="name"
@@ -86,6 +160,7 @@ const EditPage = () => {
                 className="pl-10"
                 value={form.name}
                 onChange={handleChange}
+                disabled={isUpdating}
               />
             </div>
           </div>
@@ -101,36 +176,61 @@ const EditPage = () => {
                 className="pl-10"
                 value={form.username}
                 onChange={handleChange}
+                disabled={isUpdating}
               />
             </div>
           </div>
 
           <div className="space-y-2 relative">
             <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              name="password"
-              type={showPassword ? "text" : "password"}
-              placeholder="Enter your password"
-              className="pl-10"
-              value={form.password}
-              onChange={handleChange}
-            />
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => setShowPassword((prev) => !prev)}
-              className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent mt-2"
-            >
-              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-            </Button>
+            <div className="relative">
+              <KeyRound className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500"/>
+                <Input
+                id="password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter your password"
+                className="pl-10"
+                value={form.password}
+                onChange={handleChange}
+                disabled={isUpdating}
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                disabled={isUpdating}
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </Button>
+            </div>
+          </div>
+
+          <div>
+            <Label htmlFor="notes">Notes</Label>
+            <div className="relative">
+              <NotebookText className="absolute left-3 top-1/10 h-4 w-4 text-gray-500"/>
+              <textarea
+                  id="notes"
+                  name="notes"
+                  placeholder="Enter notes"
+                  className="pl-10 min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  value={form.notes}
+                  onChange={handleChange}
+                  rows={4}
+                  disabled={isUpdating}
+              />
+            </div>
           </div>
         </CardContent>
         <CardFooter className="flex justify-end space-x-2">
-          <Button type="submit" variant="outline" onClick={() => router.push("/vault")}>
+          <Button type="submit" variant="outline" onClick={() => router.push("/vault")} disabled={isUpdating}>
             Cancel
           </Button>
-          <Button onClick={handleUpdate}>Update</Button>
+          <Button onClick={handleUpdate} disabled={isUpdating}>
+            {isUpdating ? "Updating..." : "Update"}
+          </Button>
         </CardFooter>
       </Card>
     </div>

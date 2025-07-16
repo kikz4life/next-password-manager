@@ -19,6 +19,9 @@ const passwordSchema = new mongoose.Schema(
     password: {
       iv : { type: String, required: true },
       content: { type: String, required: true },
+    },
+    notes: {
+        type: String,
     }
   },
   { timestamps: true }
