@@ -7,46 +7,46 @@ import {auth} from "@clerk/nextjs/server";
 import {connectDB} from "@/lib/mongodb";
 
 export async function POST(req: Request) {
-  try {
-    await connectDB();
+    try {
+        await connectDB();
 
-    const body = await req.json();
-    const {userId, name, username, password} = body;
+        const body = await req.json();
+        const {userId, name, username, password, notes} = body;
 
-    if (!userId || !name || !username || !password || !password.length) {
-      return NextResponse.json({error: "Missing fields"}, {status: 400})
+        if (!userId || !name || !username || !password || !password.length) {
+            return NextResponse.json({error: "Missing fields"}, {status: 400})
+        }
+
+        //encrypt password
+        const encryptedPassword = encrypt(password);
+        const saved = await savePassword({userId, name, username, password: encryptedPassword, notes});
+
+        return NextResponse.json({success: true, data: saved}, {status: 200});
+
+    } catch (error) {
+        console.log("Error saving password:", error);
+        return NextResponse.json({error: "Internal server error"}, {status: 500});
     }
-
-    //encrypt password
-    const encryptedPassword = encrypt(password);
-    const saved = await savePassword({userId, name, username, password: encryptedPassword});
-
-    return NextResponse.json({success: true, data: saved}, {status: 200});
-
-  } catch (error) {
-    console.log("Error saving password:", error);
-    return NextResponse.json({error: "Internal server error"}, {status: 500});
-  }
 }
 
 export async function GET() {
-  try {
-    await connectDB();
+    try {
+        await connectDB();
 
-    const {userId} = await auth();
+        const {userId} = await auth();
 
-    const passwords = await Password.find({userId}).lean();
+        const passwords = await Password.find({userId}).lean();
 
-    // Decrypt the password field
-    const decryptedPasswords = passwords.map((entry) => ({
-      ...entry,
-      password: decrypt(entry.password),
-    }));
+        // Decrypt the password field
+        const decryptedPasswords = passwords.map((entry) => ({
+            ...entry,
+            password: decrypt(entry.password),
+        }));
 
-    return NextResponse.json({success: true, data: decryptedPasswords});
+        return NextResponse.json({success: true, data: decryptedPasswords});
 
-  } catch (error) {
-    console.error("Error fetching passwords:", error);
-    return NextResponse.json({success: false, error: "Failed to fetch passwords"}, {status: 500});
-  }
+    } catch (error) {
+        console.error("Error fetching passwords:", error);
+        return NextResponse.json({success: false, error: "Failed to fetch passwords"}, {status: 500});
+    }
 }
