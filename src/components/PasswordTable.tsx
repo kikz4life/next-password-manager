@@ -60,9 +60,9 @@ export function PasswordTable<TData, TValue>({
     () =>
       loading
         ? columns.map((column) => ({
-          ...column,
-          cell: () => <Skeleton className="h-4 w-full bg-gray-300 animate-pulse" />,
-        }))
+            ...column,
+            cell: () => <Skeleton className="h-4 w-full bg-gray-300" />,
+          }))
         : columns,
     [loading, columns]
   );
@@ -117,7 +117,7 @@ export function PasswordTable<TData, TValue>({
                     className="capitalize"
                     checked={column.getIsVisible()}
                     onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
+                      column.toggleVisibility(Boolean(value))
                     }
                   >
                     {column.id}

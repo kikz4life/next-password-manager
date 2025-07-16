@@ -15,13 +15,11 @@ interface SavePasswordProps {
 export const savePassword = async ({userId, name, username, password, notes}: SavePasswordProps) => {
   await connectDB();
 
-  const newPassword = await Password.create({
+  return (await Password.create({
     userId,
     name,
     username,
     password,
     notes
-  });
-
-  return newPassword;
+  })).toObject();
 }
